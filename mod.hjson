@@ -23,7 +23,7 @@ See README.md for more info.
 
 version: 2.3
 subtitle: "Adds a superior console UI."
-minGameVersion: 154
+minGameVersion: 155.4
 hidden: true
 java: true
 main: "newconsole.NewConsoleMod"
