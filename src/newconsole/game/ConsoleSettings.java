@@ -34,6 +34,8 @@ public class ConsoleSettings {
             root.checkPref("newconsole.remember-button-position", true);
 
             root.checkPref("newconsole.log-autorun-output", true);
+
+            root.checkPref("newconsole.reuse-compiled-script", false);
         });
     }
 

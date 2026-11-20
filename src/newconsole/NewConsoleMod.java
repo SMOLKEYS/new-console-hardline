@@ -5,8 +5,8 @@ import arc.math.geom.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.Seq;
 import arc.util.*;
-import com.github.mnemotechnician.autoupdater.*;
 import mindustry.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -38,8 +38,6 @@ public class NewConsoleMod extends Mod {
                 cons.autorun.load();
             });
         });
-
-        Events.run(EventType.ClientLoadEvent.class, this::checkUpdates);
     }
 
     public static void executeStartup() {
@@ -59,10 +57,6 @@ public class NewConsoleMod extends Mod {
         }
     }
 
-    public void checkUpdates() {
-        Updater.checkUpdates(this);
-    }
-
     public void initConsole() {
         ConsoleVars.group = new WidgetGroup();
         ConsoleVars.group.setFillParent(true);
@@ -70,10 +64,26 @@ public class NewConsoleMod extends Mod {
         ConsoleVars.group.visible(() -> ConsoleVars.consoleEnabled);
         Core.scene.add(ConsoleVars.group);
 
-        ConsoleVars.consoles.add(new Console(new JsCodeArea("", CStyles.monoArea), "JS", code -> Vars.mods.getScripts().runConsole(code), (script, variable, eventObj) -> {
+        Seq<CompiledScript> compiled = new Seq<>();
+        ConsoleVars.consoles.add(new Console(new JsCodeArea("", CStyles.monoArea), "JS", code -> {
+            if(Core.settings.getBool("newconsole.reuse-compiled-script", false)) {
+                // don't compile empty scripts
+                if(code.isBlank()) return "<no code evaluated>";
+
+                CompiledScript scr = compiled.find(c -> c.isMatching(code));
+                if(scr == null){
+                    scr = CompiledScript.with(code);
+                    compiled.add(scr);
+                }
+                return scr.execWithResult();
+            } else {
+                return Vars.mods.getScripts().runConsole(code);
+            }
+        }, (script, variable, eventObj) -> {
             Vars.mods.getScripts().scope.put(variable, Vars.mods.getScripts().scope, eventObj);
 
-            String res = Vars.mods.getScripts().runConsole(script.replaceAll("_autorun_event", variable));
+            String finalScript = script.replaceAll("_autorun_event", variable);
+            String res = Vars.mods.getScripts().runConsole(finalScript);
 
             Vars.mods.getScripts().scope.delete(variable);
 

@@ -21,7 +21,7 @@ In addition to the console, this mod offers:
 See README.md for more info.
 '''
 
-version: 2.3
+version: 2.31
 subtitle: "Adds a superior console UI."
 minGameVersion: 155.4
 hidden: true

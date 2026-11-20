@@ -246,6 +246,11 @@ public class Console extends BaseDialog {
     public void readHistory() {
         var backup = historySaveFile.sibling(historySaveFile.name() + ".backup");
         Func<Fi, Boolean> readFrom = (file) -> {
+            if(!file.exists()){
+                Log.warn("No script history save file found. Will generate a new one.");
+                return true;
+            }
+
             try (var reads = file.reads()) {
                 var count = reads.i();
                 if (count < 0 || count > 1000)
@@ -262,8 +267,8 @@ public class Console extends BaseDialog {
             }
         };
 
-        if (historySaveFile.exists() && readFrom.get(historySaveFile)) return;
-        if (backup.exists() && readFrom.get(backup)) return;
+        if (readFrom.get(historySaveFile)) return;
+        if (readFrom.get(backup)) return;
 
         Log.warn("Attempted to read the script history, but the save and backup files either don't exist or couldn't be loaded.");
     }

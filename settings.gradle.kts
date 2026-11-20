@@ -1,18 +1,22 @@
 pluginManagement{
     repositories{
-        mavenLocal()
-        mavenCentral()
         gradlePluginPortal()
-        maven("https://jitpack.io")
+        mavenLocal()
         maven("https://raw.githubusercontent.com/GglLfr/EntityAnnoMaven/main")
+        maven("https://raw.githubusercontent.com/GglLfr/MindustryClientMaven/main")
     }
 
+    plugins{
+        val entVersion = providers.gradleProperty("entVersion")
+        val clientVersion = providers.gradleProperty("clientVersion")
+
+        id("com.github.GglLfr.EntityAnno") version(entVersion)
+        id("com.github.GglLfr.MindustryClient") version(clientVersion)
+        kotlin("jvm") version "2.4.21"
+    }
 }
-if(JavaVersion.current().ordinal < JavaVersion.VERSION_17.ordinal) throw GradleException("JDK 17 is a required minimum version. Yours: ${System.getProperty("java.version")}")
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
 
-
-val modName: String by settings
-rootProject.name = modName
-
-
-include(":")
+rootProject.name = "new-console-hardline"
